@@ -19,7 +19,10 @@
 #https://www.nltk.org/api/nltk.tokenize.html
 #From https://stackoverflow.com/questions/716477/join-list-of-lists-in-python
 #https://www.machinelearningplus.com/nlp/lemmatization-examples-python/)
-##https://www.geeksforgeeks.org/how-to-iterate-through-a-nested-list-in-python/
+#https://www.geeksforgeeks.org/how-to-iterate-through-a-nested-list-in-python/
+#https://www.youtube.com/watch?v=uJbNIWPakj0
+#https://www.geeksforgeeks.org/overlay-an-image-on-another-image-in-python/
+#https://stackoverflow.com/questions/5324647/how-to-merge-a-transparent-png-image-with-another-image-using-pil#5324782
 
 from wordcloud import WordCloud
 from PIL import Image
@@ -74,12 +77,29 @@ for meetings in range(len(meetings_post_pre)) :
     delete_lst = ['committee', 'fund', 'rate', 'federal','monetary', 'policy', 'percent', 'target', 'range', 'economic', 'activity']
     words_v2 = [w for w in final_words if w not in delete_lst]
 
-#The masked images are labeled "Fred_0" and "Fred_1" corresponding to FOMC meetings before and after the COVID-related recession. I downloaded the graph from Fred and then opened and edited it in MSPaint. You can use the rectangular and free-form selection tools and eraser tool to select and erase sections of the graph. Then fill the image with black to make an appropriate mask. Be sure to erase everything but the mask including horizontal lines in the plot area.
+#The masked images are labeled "Fred_0" and "Fred_1" corresponding to FOMC meetings before and after the COVID-related recession. I downloaded the graph from Fred and then opened and edited it in Gimp. You can use the fuzzy select tool and bucket fill tool to select and fill the two masks with black. Be sure to select and fill everything but the mask with white. 
+
+#Change the contour_color to 'white'. The Fred graph will have the funds rate already shown.
     unique_string_v2=(" ").join(words_v2)
+    #print(unique_string_v2)
     cloud_mask = np.array(Image.open("Fred_{}.png".format(meetings)))    
     wordcloud = WordCloud(width = 1000, height = 500, background_color="white",
-                          mask=cloud_mask, max_words=5000, contour_width=2, contour_color='black')
+                          mask=cloud_mask, max_words=5000, contour_width=2, contour_color='white')
     wordcloud.generate(unique_string_v2)
 
-#The two generated wordclouds are "word_cloud_masked_0" and "word_cloud_masked_1" corresponding to "Fred_0" and "Fred_1". I cleaned up the edges in MSPaint with the eraser tool and then selected the images with the free-form selection tool. Finally, copy/paste into the original Fred graph in MSPaint and resize to fit if needed. Save the image as .png or the image type needed.
+#The two generated wordclouds are "word_cloud_masked_0" and "word_cloud_masked_1" corresponding to "Fred_0" and "Fred_1". I cleaned up the edges in Gimp with the feather tool, too. Finally, select and create translucent areas in the original Fred graph by adding an alpha layer in the selection. Save the image as .png or the image type needed.
     wordcloud.to_file("word_cloud_masked_{}.png".format(meetings))
+
+img1 = Image.open(r"Fred.png") 
+img2 = Image.open(r"word_cloud_masked_0.png") 
+img3 = Image.open(r"word_cloud_masked_1.png")
+img4 = Image.open(r"Fredtrans.png")
+
+# No transparency mask specified,  
+# simulating an raster overlay 
+img3.paste(img2, (0,0)) 
+
+#transparency mask specified as img4.
+img3.paste(img4, (0,0), mask = img4) 
+  
+img3.show()
